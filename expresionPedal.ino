@@ -5,48 +5,9 @@
 
 #include "ArduinoSTL.h"
 #include "vector"
+#include "OutputPinClass.h"
 
-class outputPin
-{
-  public:
-  outputPin(){};
-  outputPin(int pinNumber)
-  {
-    if (!setPinNumber(pinNumber))
-      return; //MSG::could not set outputPin. defaulted at zero
-  }
-  
-  bool getState() {return m_state;};
-  bool setState(bool state) {m_state = state;};
 
-  bool getSwitchState() {return m_switchState;};
-  bool setSwitchState(bool state) {m_switchState = state;};
-
-  int getPinNumber() {return m_pinNumber;};
-  bool setPinNumber(int newPin) {
-    if ( newPin < m_minPinNum || newPin > m_maxPinNum )
-      return false;
-    m_pinNumber = newPin;
-    return true;
-  }
-
-  float getCurrentValue() {return m_currentValue;};
-  bool setCurrentValue(float input)
-  {
-    if (input < 0.0f || input > 5.0f)
-      return false;
-    m_currentValue = input;
-    return true;
-  }
-  
-private:
-  float m_currentValue = 0;
-  bool m_state = false;
-  int m_maxPinNum = 10;
-  int m_minPinNum = 0;
-  int m_pinNumber = 0;
-  bool m_switchState = false;
-};
 
 int m_expressionReadPin = 0;
 int m_smoothingReadPin = 1;
@@ -55,7 +16,7 @@ std::vector<outputPin> m_outputPins(8);
 float m_currentInputValue = 0;
 float m_scaledSmoothingValue = 0;
 float m_directSmoothingValue = 0;
-bool m_multiControl = true; //not happy with this name.
+bool m_multiControl = false; //not happy with this name.
 
 float m_smoothingMsMin = 2.0f;
 float m_smoothingMsMax = 100.0f;
@@ -67,15 +28,15 @@ float interpolate(float oldVal, float newVal, float smoothingVal)
   
   if (oldVal < newVal)
     oldVal = oldVal + 0.01;
-   else if (oldVal > newVal)
+  else if (oldVal > newVal)
     oldVal = oldVal - 0.01;
 
-   if (oldVal > 5.0f)
+  if (oldVal > 5.0f)
     oldVal = 5.0f;
-    else if (oldVal< 0.0f)
+  else if (oldVal< 0.0f)
     oldVal = 0.0f;
 
-    return oldVal;
+  return oldVal;
 }
 
 
@@ -91,7 +52,17 @@ void setup() {
   m_outputPins[6].setPinNumber(6);
   m_outputPins[7].setPinNumber(7);
 
+  m_outputPins[0].setLedPinNumber(8);
+  m_outputPins[1].setLedPinNumber(9);
+  m_outputPins[2].setLedPinNumber(10);
+  m_outputPins[3].setLedPinNumber(11);
+  m_outputPins[4].setLedPinNumber(12);
+  m_outputPins[5].setLedPinNumber(13);
+  m_outputPins[6].setLedPinNumber(14);
+  m_outputPins[7].setLedPinNumber(15);
+
   m_outputPins[0].setState(true);
+  digitalWrite(m_outputPins[0].getLedPinNumber(), m_outputPins[0].getLedState());
 }
 
 void loop() {
@@ -102,28 +73,30 @@ void loop() {
 
     if (readIn == iter->getSwitchState())
       continue;
-    else if( readIn && !iter->getSwitchState())
+    else if(readIn && !iter->getSwitchState())
     {
+      iter->setSwitchState(true);
+      bool temp = iter->getState();
       if(!m_multiControl)
       {
-        bool temp = iter->getState();
         //std::for_each(m_outputPins.begin(), m_outputPins.end(), this->setState(false)); //TODO: implement rather than a second loop....
         for (auto iter2 = m_outputPins.begin(); iter2 != m_outputPins.end(); ++iter2)
         {
           iter2->setState(false);
         }
-        iter->setState(!temp);
       }
-      iter->setSwitchState(true);
-      iter->setState(!iter->getState()); //invert the current setting
-      
-      //TODO:
-      //update LED output
+      iter->setState(!temp);
     }
     else if (!readIn && iter->getSwitchState())
     {
       iter->setSwitchState(false);
     }
+  }
+
+  //update LEDs
+  for (auto iter = m_outputPins.begin(); iter != m_outputPins.end(); ++iter)
+  {
+    digitalWrite(iter.getLedPinNumber(), iter.getState());
   }
   
   //read in analogue value
