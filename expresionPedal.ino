@@ -10,15 +10,13 @@
 int m_expressionReadPin = 0;
 int m_smoothingReadPin = 1;
 std::vector<outputPin> m_outputPins(8);
-
 float m_currentInputValue = 0;
 float m_scaledSmoothingValue = 0;
 float m_directSmoothingValue = 0;
 bool m_multiControl = false; //not happy with this name.
-
+int m_multiControlPin = 0;
 float m_smoothingMsMin = 2.0f;
 float m_smoothingMsMax = 100.0f;
-
 
 float interpolate(float oldVal, float newVal, float smoothingVal)
 {
@@ -36,7 +34,6 @@ float interpolate(float oldVal, float newVal, float smoothingVal)
 
   return oldVal;
 }
-
 
 void setup() {
   //TODO: check state of unused pins on default could just set to zero here.
@@ -64,6 +61,10 @@ void setup() {
 }
 
 void loop() {
+  
+  //update switch mode
+  m_multiControl = digitalRead(m_multiControlPin);
+  
   //update buttons pressed
   for (auto iter = m_outputPins.begin(); iter != m_outputPins.end(); ++iter)
   {
@@ -116,6 +117,7 @@ void loop() {
 
     iter->setCurrentValue(interpolate(iter->getCurrentValue(), m_currentInputValue, m_scaledSmoothingValue));
     analogWrite(iter->getPinNumber(), iter->getCurrentValue()); //TODO: see note at bottom
+    
     if(!m_multiControl)
       break; //exit for loop because only one should be changed :)
   }
