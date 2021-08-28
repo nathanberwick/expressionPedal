@@ -7,8 +7,6 @@
 #include "vector"
 #include "OutputPinClass.h"
 
-
-
 int m_expressionReadPin = 0;
 int m_smoothingReadPin = 1;
 std::vector<outputPin> m_outputPins(8);
@@ -62,7 +60,7 @@ void setup() {
   m_outputPins[7].setLedPinNumber(15);
 
   m_outputPins[0].setState(true);
-  digitalWrite(m_outputPins[0].getLedPinNumber(), m_outputPins[0].getLedState());
+  digitalWrite(m_outputPins[0].getLedPinNumber(), m_outputPins[0].getState());
 }
 
 void loop() {
@@ -96,7 +94,7 @@ void loop() {
   //update LEDs
   for (auto iter = m_outputPins.begin(); iter != m_outputPins.end(); ++iter)
   {
-    digitalWrite(iter.getLedPinNumber(), iter.getState());
+    digitalWrite(iter->getLedPinNumber(), iter->getState());
   }
   
   //read in analogue value

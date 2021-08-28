@@ -4,8 +4,7 @@ class outputPin
   outputPin(){};
   outputPin(int pinNumber)
   {
-    if (!setPinNumber(pinNumber))
-      return; //MSG::could not set outputPin. defaulted at zero
+    setPinNumber(pinNumber);
   }
   
   bool getState() {return m_state;};
