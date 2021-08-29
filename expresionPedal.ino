@@ -1,8 +1,3 @@
-//#include <unwind-cxx.h>
-//#include <StandardCplusplus.h>
-//#include <system_configuration.h>
-//#include <utility.h>
-
 #include "ArduinoSTL.h"
 #include "vector"
 #include "OutputPinClass.h"
@@ -16,16 +11,17 @@ float m_directSmoothingValue = 0;
 bool m_multiControl = false; //not happy with this name.
 int m_multiControlPin = 2; //digital 2
 float m_smoothingMsMin = 2.0f;
-float m_smoothingMsMax = 100.0f;
+float m_smoothingMsMax = 1000.0f;
+
+int m_rate = 10; //in ms. how many times the main loop is called per ms.
 
 float interpolate(float oldVal, float newVal, float smoothingVal)
 {
-  //TODO: factor in smoothing value
-  
-  if (oldVal < newVal)
-    oldVal = oldVal + 0.01;
-  else if (oldVal > newVal)
-    oldVal = oldVal - 0.01;
+  if (oldVal != newVal)
+  {
+    float increment = (newVal-oldVal) / (smoothingVal * m_rate);
+    oldVal = oldVal + increment;
+  }
 
   if (oldVal > 5.0f)
     oldVal = 5.0f;
