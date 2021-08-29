@@ -5,13 +5,15 @@
 int m_expressionReadPin = A0;
 int m_smoothingReadPin = A1;
 std::vector<OutputPinClass> m_outputPins(5);
-float m_currentInputValue = 0;
+int m_currentInputValue = 0; //10 bit
 float m_scaledSmoothingValue = 0;
-float m_directSmoothingValue = 0;
+float m_directSmoothingValue = 0; //10 bit
 bool m_multiControl = false; //not happy with this name.
 int m_multiControlPin = 2; //digital 2
 float m_smoothingMsMin = 2.0f;
 float m_smoothingMsMax = 1000.0f;
+
+bool ledBlink = true;
 
 int m_rate = 10; //in ms. how many times the main loop is called per ms.
 
@@ -57,6 +59,8 @@ void setup() {
 }
 
 void loop() {
+  ledBlink = !ledBlink;
+  digitalWrite(13, ledBlink);
   
   //update switch mode
   m_multiControl = digitalRead(m_multiControlPin);
@@ -96,13 +100,13 @@ void loop() {
   
   //read in analogue value
   m_currentInputValue = analogRead(m_expressionReadPin);
-  float temp = analogRead(m_smoothingReadPin);
+  int temp = analogRead(m_smoothingReadPin);
 
   //only recalculate if necessary
   if (m_directSmoothingValue != temp)
   {
     m_directSmoothingValue = temp;
-    m_scaledSmoothingValue = ((m_directSmoothingValue / 5.0f) * (m_smoothingMsMax - m_smoothingMsMin)) + m_smoothingMsMin;
+    m_scaledSmoothingValue = ((m_directSmoothingValue / 1023.0f) * (m_smoothingMsMax - m_smoothingMsMin)) + m_smoothingMsMin;
   }
 
   //update values
@@ -112,7 +116,7 @@ void loop() {
       continue;
 
     iter->setCurrentValue(interpolate(iter->getCurrentValue(), m_currentInputValue, m_scaledSmoothingValue));
-    analogWrite(iter->getPinNumber(), iter->getCurrentValue()); //TODO: see note at bottom
+    analogWrite(iter->getPinNumber(), (unsigned int)iter->getCurrentValue()>>2); //TODO: see note at bottom
     
     if(!m_multiControl)
       break; //exit for loop because only one should be changed :)
