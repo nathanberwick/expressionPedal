@@ -1,32 +1,26 @@
-class outputPin
+#ifndef OUTPUTPINCLASS_H
+#define OUTPUTPINCLASS_H
+
+class OutputPinClass
 {
   public:
-  outputPin(){};
-  outputPin(int pinNumber)
-  {
-    setPinNumber(pinNumber);
-  }
-  
-  bool getState() {return m_state;};
-  bool setState(bool state) {m_state = state;};
+  bool getState();
+  bool setState(bool state);
 
-  bool getSwitchState() {return m_switchState;};
-  bool setSwitchState(bool state) {m_switchState = state;};
+  bool getSwitchState();
+  bool setSwitchState(bool state);
 
-  int getPinNumber() {return m_pinNumber;};
-  void setPinNumber(int newPin) {m_pinNumber = newPin;};
+  int getPinNumber();
+  void setPinNumber(int newPin);
 
-  float getCurrentValue() {return m_currentValue;};
-  bool setCurrentValue(float input)
-  {
-    if (input < 0.0f || input > 5.0f)
-      return false;
-    m_currentValue = input;
-    return true;
-  }
+  float getCurrentValue();
+  bool setCurrentValue(float input);
 
-  int getLedPinNumber() {return m_ledPinNum;};
-  void setLedPinNumber(int pinNum) { m_ledPinNum = pinNum;};
+  int getLedPinNumber();
+  void setLedPinNumber(int pinNum);
+
+  int getSwitchNumber();
+  void setSwitchNumber(int switchNum);
   
 private:
   float m_currentValue = 0;
@@ -34,4 +28,7 @@ private:
   int m_pinNumber = 0;
   int m_ledPinNum = 0;
   bool m_switchState = false;
+  int m_switchNumber = 0;
 };
+
+#endif
