@@ -3,18 +3,20 @@
 #include "OutputPinClass.h"
 
 int m_expressionReadPin = A0;
-int m_smoothingReadPin = A1;
-std::vector<OutputPinClass> m_outputPins(5);
 int m_currentInputValue = 0; //10 bit
+
+int m_smoothingReadPin = A1;
 float m_scaledSmoothingValue = 0;
 float m_directSmoothingValue = 0; //10 bit
-bool m_multiControl = false; //not happy with this name.
-int m_multiControlPin = 2; //digital 2
 float m_smoothingMsMin = 2.0f;
 float m_smoothingMsMax = 1000.0f;
 
-bool ledBlink = true;
+bool m_multiControl = false; //not happy with this name.
+int m_multiControlPin = 2; //digital 2
 
+std::vector<OutputPinClass> m_outputPins(5);
+
+bool ledBlink = true;
 int m_rate = 10; //in ms. how many times the main loop is called per ms.
 
 float interpolate(float oldVal, float newVal, float smoothingVal)
@@ -34,8 +36,6 @@ float interpolate(float oldVal, float newVal, float smoothingVal)
 }
 
 void setup() {
-  //TODO: check state of unused pins on default could just set to zero here.
-  //TODO: possible to save last used state before off?
   m_outputPins[0].setPinNumber(3);
   m_outputPins[1].setPinNumber(5);
   m_outputPins[2].setPinNumber(6);
@@ -122,19 +122,3 @@ void loop() {
       break; //exit for loop because only one should be changed :)
   }
 }
-
-/* OUTPUT VALUE NOTES:
- * output value needs to be scaled to between 0 and 255. then the hardware should have an LPF to smooth this to a consistent intermediary voltage.
- * Board  PWM Pins  PWM Frequency
-
-Uno, Nano, Mini
-  
-
-3, 5, 6, 9, 10, 11
-  
-
-490 Hz (pins 5 and 6: 980 Hz)
- * 
- * 
- * 
- */
