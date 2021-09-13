@@ -14,10 +14,10 @@ float m_smoothingMsMax = 1000.0f;
 bool m_multiControl = false; //not happy with this name.
 int m_multiControlPin = 2; //digital 2
 
-std::vector<OutputPinClass> m_outputPins(5);
+std::vector<OutputPinClass> m_outputPins(4);
 
 bool ledBlink = true;
-int m_rate = 10; //in ms. how many times the main loop is called per ms.
+int m_rate = 10; //in ms. how many times the main loop is called per ms. //TODO:: calculate this with oscilloscope
 
 float interpolate(float oldVal, float newVal, float smoothingVal)
 {
@@ -40,19 +40,16 @@ void setup() {
   m_outputPins[1].setPinNumber(5);
   m_outputPins[2].setPinNumber(6);
   m_outputPins[3].setPinNumber(9);
-  m_outputPins[4].setPinNumber(10);
 
   m_outputPins[0].setLedPinNumber(4);
   m_outputPins[1].setLedPinNumber(7);
   m_outputPins[2].setLedPinNumber(8);
   m_outputPins[3].setLedPinNumber(11);
-  m_outputPins[4].setLedPinNumber(12);
 
   m_outputPins[0].setSwitchNumber(A2);
   m_outputPins[1].setSwitchNumber(A3);
   m_outputPins[2].setSwitchNumber(A4);
   m_outputPins[3].setSwitchNumber(A5);
-  m_outputPins[4].setSwitchNumber(A6);
 
   m_outputPins[0].setState(true);
   digitalWrite(m_outputPins[0].getLedPinNumber(), m_outputPins[0].getState());
@@ -116,7 +113,7 @@ void loop() {
       continue;
 
     iter->setCurrentValue(interpolate(iter->getCurrentValue(), m_currentInputValue, m_scaledSmoothingValue));
-    analogWrite(iter->getPinNumber(), (unsigned int)iter->getCurrentValue()>>2); //TODO: see note at bottom
+    analogWrite(iter->getPinNumber(), (unsigned int)iter->getCurrentValue()>>2);
     
     if(!m_multiControl)
       break; //exit for loop because only one should be changed :)
